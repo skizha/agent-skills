@@ -16,6 +16,15 @@
       "skills": [
         "./skills/humanize"
       ]
+    },
+    {
+      "name": "sql-server-query-tuner",
+      "description": "SQL Server query performance tuning. Analyzes execution plans, identifies anti-patterns, recommends indexes, rewrites slow queries, and runs DMV diagnostics against live instances.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/sql-server-query-tuner"
+      ]
     }
   ]
 }
