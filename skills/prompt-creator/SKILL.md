@@ -28,15 +28,16 @@ Determine which techniques apply based on the request type:
 | Request type | Primary techniques |
 |---|---|
 | Chatbot / assistant | Role/persona, system prompt split, constraint specification |
-| Data extraction | Structured output (JSON), XML tags, constraint specification |
-| Classification | Few-shot examples (`<examples>` tags), structured output |
-| Reasoning / analysis | Chain-of-thought (CoT), extended thinking |
+| Data extraction | Structured output (JSON), XML tags, constraint specification, give model an "out" |
+| Classification | Few-shot examples (`<examples>` tags), structured output, conclusions-last ordering |
+| Reasoning / analysis | Chain-of-thought (CoT), extended thinking, output priming |
 | Multi-phase complex tasks | Prompt chaining, self-correction chain |
-| Document generation | Decomposition, template pattern |
+| Document generation | Decomposition, template pattern, output priming |
 | Code gen / review | Constraint specification, structured output, CoT self-verification |
-| RAG / document QA | Docs-above-query ordering, retrieval augmentation, XML doc structure |
+| RAG / document QA | Docs-above-query ordering, citations as anti-hallucination, give model an "out" |
 | Agent / tool use | Agentic pattern, constraint specification |
-| Improving a bad prompt | Diagnose first (see Diagnostics below), then apply fixes |
+| Writing a prompt from scratch | Meta-prompting — describe the task, let the model draft |
+| Improving a bad prompt | Diagnose first (see Diagnostics below), meta-prompting for alternatives |
 
 Read [references/techniques.md](references/techniques.md) for full technique details and examples (including Prompt Chaining).
 Read [references/claude-specifics.md](references/claude-specifics.md) when targeting Claude specifically (XML tags, **critical long-context ordering**, extended thinking, system vs human split, prompt injection defense).
@@ -61,14 +62,16 @@ Present the finished prompt in a code block. Briefly explain key design choices 
 Before delivering any prompt, verify:
 
 - [ ] Task is unambiguous — a stranger could execute it correctly
-- [ ] Output format is explicitly specified
+- [ ] Output format is explicitly specified (or output primed with a partial phrase)
 - [ ] Both "do" and "do NOT" constraints are present where relevant
+- [ ] Model has an "out" for cases it can't answer (e.g., "respond with 'not found' if...")
 - [ ] Variables/placeholders use a consistent convention: `[PLACEHOLDER]` or `{{placeholder}}`
 - [ ] Long prompts use XML tags or clear section headers to separate concerns
-- [ ] No conflicting instructions
+- [ ] No conflicting instructions; key constraints repeated at the end if critical
 - [ ] Role/persona is assigned if tone or expertise level matters
 - [ ] Few-shot examples included if output style is non-obvious
 - [ ] Reasoning requested (CoT) if the task involves multi-step logic
+- [ ] Citations requested if factual accuracy and grounding are critical
 
 ---
 
@@ -77,7 +80,8 @@ Before delivering any prompt, verify:
 When a user brings an underperforming prompt, diagnose before prescribing:
 
 **Hallucination / making things up**
-- Add: "If you don't know, say so. Do not speculate."
+- Add a fallback: "If the answer isn't in the context, respond with 'Not found.'"
+- Add citation requirement: "After each claim, cite the source. Do not make claims you can't cite." (forcing citations forces double errors to fabricate)
 - For RAG: add explicit grounding instructions and prompt injection defense (see claude-specifics.md)
 
 **Wrong format / structure**
@@ -93,7 +97,7 @@ When a user brings an underperforming prompt, diagnose before prescribing:
 - Assign a specific persona; add explicit tone descriptors; provide a style example
 
 **Ignoring part of the instructions**
-- Use XML tags to separate sections; move critical instructions to the end (Claude attends to both start and end)
+- Use XML tags to separate sections; repeat critical instructions at the end (recency bias — the model gives more weight to content near the end)
 - Simplify: break into multiple smaller prompts if complexity is the issue
 
 **Reasoning errors**

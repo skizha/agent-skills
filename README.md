@@ -40,6 +40,16 @@ Skills trigger automatically based on your prompt. For example:
 
 You can also invoke it directly with `/humanize`.
 
+**Prompt Creator** — activates when you say things like:
+- "write a prompt for a customer service chatbot"
+- "create a system prompt that outputs JSON"
+- "improve this prompt — it keeps hallucinating"
+- "help me prompt engineer a RAG pipeline"
+- "why isn't my prompt working?"
+- "make a few-shot prompt for sentiment classification"
+
+Covers all major techniques: role/persona, few-shot, chain-of-thought, prompt chaining, structured output, RAG, agentic prompts, and meta-prompting. Includes Claude-specific best practices (XML tags, extended thinking, long context ordering) and a diagnostics guide for fixing underperforming prompts. Based on official docs from Anthropic, Microsoft Azure OpenAI, and OpenAI.
+
 **SQL Server Query Tuner** — activates when you say things like:
 - "tune this query"
 - "why is this SQL slow"

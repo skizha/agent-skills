@@ -7,10 +7,13 @@
 4. [Chain-of-Thought (CoT)](#chain-of-thought-cot)
 5. [Prompt Chaining](#prompt-chaining)
 6. [Structured Output](#structured-output)
-7. [Constraint Specification](#constraint-specification)
-8. [Self-Consistency / Verification](#self-consistency--verification)
-9. [Retrieval Augmentation Pattern](#retrieval-augmentation-pattern)
-10. [Iterative Refinement Pattern](#iterative-refinement-pattern)
+7. [Output Priming / Cues](#output-priming--cues)
+8. [Constraint Specification](#constraint-specification)
+9. [Self-Consistency / Verification](#self-consistency--verification)
+10. [Retrieval Augmentation Pattern](#retrieval-augmentation-pattern)
+11. [Meta-Prompting](#meta-prompting)
+12. [Iterative Refinement Pattern](#iterative-refinement-pattern)
+13. [Production Best Practices](#production-best-practices)
 
 Source: Anthropic prompt engineering docs (https://platform.claude.com/docs/en/docs/build-with-claude/prompt-engineering/overview)
 
@@ -210,9 +213,43 @@ List the top 5 risks. For each risk use this format:
 - Mitigation: [one sentence]
 ```
 
+**Token efficiency tip:** For passing dense structured data, markdown tables are more token-efficient than JSON or repeated field labels. Avoid excessive whitespace — consecutive spaces are each their own token.
+
 **Tip:** Ask Claude to wrap outputs in XML tags (e.g., `<json>`, `<analysis>`) to make post-processing easier when responses contain both reasoning and structured data.
 
 **When to use:** API integration, downstream processing, reports, consistent document generation.
+
+---
+
+## Output Priming / Cues
+
+End the prompt with a partial phrase to "jumpstart" the model toward a specific format. The model continues from where you left off.
+
+```
+Summarize the following meeting notes.
+
+Key takeaways:
+-
+```
+
+```
+Based on the data below, the most likely root cause is:
+```
+
+```
+Here's a bulleted list of action items:
+•
+```
+
+**Why it works:** The model completes what looks like the most natural continuation of the text. Priming the output is often more reliable than describing the format in instructions alone.
+
+**Tips:**
+- Combine with explicit format instructions for maximum reliability
+- Use numbered or bulleted prefixes to force list output
+- Use `##` or section headings to prime structured document output
+- Priming with `"The answer is:"` after a reasoning block extracts a clean final answer
+
+**When to use:** Whenever you need precise output format control without overloading the instructions.
 
 ---
 
@@ -228,6 +265,21 @@ Summarize the article below.
 - Do NOT speculate beyond what the article states
 - Use active voice
 ```
+
+**Give the model an "out":** Always provide a fallback for when the model can't answer. This is one of the most effective ways to prevent hallucination.
+
+```
+Answer the question based on the document below.
+If the answer is not in the document, respond with "Not found."
+
+[DOCUMENT]
+
+Question: [QUESTION]
+```
+
+Without an explicit fallback, the model will attempt to answer anyway — often incorrectly.
+
+**Recency bias:** Information at the end of a prompt tends to have more influence on the output. If a key constraint is being ignored, try repeating it at the very end of the prompt.
 
 **When to use:** Any time defaults produce the wrong style, length, scope, or tone.
 
@@ -282,10 +334,72 @@ Question: [QUESTION]
 
 **Grounding variants:**
 - "Quote the exact sentence from the context that supports your answer."
-- "Find quotes relevant to the question first, place them in <quotes> tags, then answer based only on those quotes."
+- "Find quotes relevant to the question first, place them in `<quotes>` tags, then answer based only on those quotes."
 - "If multiple sources conflict, note the conflict and explain which you trust more and why."
 
-**When to use:** RAG pipelines, document QA, knowledge-grounded chatbots.
+**Citations as anti-hallucination:** Requiring citations is a powerful hallucination deterrent. To fabricate a response, the model must now make *two* errors — a false claim AND a bad citation. Inline citations (placed next to each claim) are more effective than citations at the end, since the model anticipates the citation sooner and stays grounded.
+
+```
+Answer the question below. After each claim, cite the source document and section in [brackets].
+If a claim cannot be supported by the provided documents, do not include it.
+
+[DOCUMENTS]
+
+Question: [QUESTION]
+```
+
+**When to use:** RAG pipelines, document QA, knowledge-grounded chatbots, research summaries.
+
+---
+
+## Meta-Prompting
+
+Use the model itself to generate or improve your prompts. Describe the task you need a prompt for, and let the model draft one — then iterate.
+
+**Generate a prompt from a task description:**
+```
+You are an expert prompt engineer. Write a high-quality prompt for the following task.
+
+Task: [DESCRIPTION OF WHAT THE PROMPT NEEDS TO DO]
+
+Requirements for the prompt:
+- Target model: Claude / GPT-4 / [MODEL]
+- Output format: [JSON / prose / list / etc.]
+- Audience for the output: [WHO READS THE RESULT]
+- Key constraints: [ANY KNOWN REQUIREMENTS]
+
+Return only the prompt, ready to use.
+```
+
+**Improve an existing prompt:**
+```
+You are an expert prompt engineer. Improve the prompt below.
+
+Current prompt:
+---
+[CURRENT PROMPT]
+---
+
+Problems observed:
+- [PROBLEM 1]
+- [PROBLEM 2]
+
+Produce an improved version that fixes these issues. Explain the key changes you made.
+```
+
+**Evaluate a prompt before using it:**
+```
+Review the prompt below and identify any weaknesses: ambiguity, missing constraints, likely failure modes, or format issues.
+
+Prompt:
+---
+[PROMPT]
+---
+
+Rate it on clarity, specificity, and completeness (1-5 each). Then suggest improvements.
+```
+
+**When to use:** When starting from scratch, when a prompt is underperforming and you want a second opinion, or when iterating quickly across many prompt versions.
 
 ---
 
@@ -307,3 +421,33 @@ Turn 3: "Adjust tone to be more formal."
 ```
 
 **When to use:** Creative writing, marketing copy, technical documentation that needs polish.
+
+---
+
+## Production Best Practices
+
+Techniques for deploying prompts reliably at scale.
+
+**Pin to a specific model version:** In production, always specify an exact model snapshot (e.g., `claude-sonnet-4-6`, `gpt-4.1-2025-04-14`) rather than a floating alias. Model updates change behavior silently — pinning prevents surprise regressions.
+
+**Build evals before shipping:** Before deploying a prompt, create a small test set of inputs and expected outputs. Measure pass rate. This lets you safely iterate on prompts and catch regressions when upgrading models.
+
+**Temperature settings:**
+| Use case | Temperature |
+|---|---|
+| Factual Q&A, data extraction, classification | 0 or very low (0.0–0.2) |
+| Summarization, analysis | 0.3–0.5 |
+| Creative writing, brainstorming | 0.7–1.0 |
+
+Adjust temperature OR top_p — not both at once, as they interact in hard-to-predict ways.
+
+**Conclusions last:** Structure prompts so that reasoning or evidence comes first and the final classification, decision, or answer appears last. This improves accuracy as the model "earns" its conclusion through the reasoning.
+
+```
+Analyze the customer review below and determine the sentiment.
+
+Review: [REVIEW]
+
+First list the positive signals, then list the negative signals.
+Sentiment:
+```
