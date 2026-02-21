@@ -9,7 +9,7 @@
   },
   "plugins": [
     {
-      "name": "humanize-skills",
+      "name": "humanize",
       "description": "Remove AI writing patterns from text. Detects and rewrites 24 categories of AI-generated patterns based on Wikipedia's Signs of AI writing guide.",
       "source": "./",
       "strict": false,
