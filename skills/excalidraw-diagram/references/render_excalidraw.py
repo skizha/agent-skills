@@ -80,7 +80,8 @@ def render(
         from playwright.sync_api import sync_playwright
     except ImportError:
         print("ERROR: playwright not installed.", file=sys.stderr)
-        print("Run: uv sync && uv run playwright install chromium", file=sys.stderr)
+        print("Option A (uv): uv sync && uv run playwright install chromium", file=sys.stderr)
+        print("Option B (pip): pip install playwright && playwright install chromium", file=sys.stderr)
         sys.exit(1)
 
     # Read and validate
@@ -127,7 +128,8 @@ def render(
         except Exception as e:
             if "Executable doesn't exist" in str(e) or "browserType.launch" in str(e):
                 print("ERROR: Chromium not installed for Playwright.", file=sys.stderr)
-                print("Run: uv run playwright install chromium", file=sys.stderr)
+                print("Option A (uv): uv run playwright install chromium", file=sys.stderr)
+                print("Option B (pip): playwright install chromium", file=sys.stderr)
                 sys.exit(1)
             raise
 

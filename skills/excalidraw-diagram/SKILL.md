@@ -60,7 +60,23 @@ Before writing JSON, sketch mentally:
 cd .claude/skills/excalidraw-diagram/references && uv run python render_excalidraw.py <file.excalidraw>
 ```
 
-First-time setup: `uv sync && uv run playwright install chromium`
+**First-time setup** (from the `references/` directory):
+
+Option A — with `uv` (recommended):
+```bash
+# Install uv if needed:
+#   Windows:  powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+#   macOS/Linux: curl -LsSf https://astral.sh/uv/install.sh | sh
+uv sync
+uv run playwright install chromium
+```
+
+Option B — with pip (no uv needed):
+```bash
+pip install playwright
+playwright install chromium
+# Then run directly: python render_excalidraw.py <file.excalidraw>
+```
 
 ## Step 5 — Validate & Iterate
 
