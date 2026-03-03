@@ -1,6 +1,6 @@
 {
   "name": "skizha-skills",
-  "description": "Community skills for Claude Code — humanize text, engineer prompts, tune SQL Server queries, and write LinkedIn articles.",
+  "description": "Community skills for Claude Code — humanize text, engineer prompts, tune SQL Server queries, write LinkedIn articles, and create Excalidraw diagrams.",
   "version": "1.0.0",
   "author": {
     "name": "Sanjesh"

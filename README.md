@@ -10,6 +10,7 @@ A plugin marketplace for [Claude Code](https://docs.anthropic.com/en/docs/claude
 | [prompt-creator](skills/prompt-creator) | Expert prompt engineering for AI models (especially Claude). Creates prompts from scratch, improves underperforming prompts, designs system prompts, structures chain-of-thought and few-shot examples, and builds RAG and agentic prompts. Based on Anthropic's official prompt engineering docs. |
 | [sql-server-query-tuner](skills/sql-server-query-tuner) | SQL Server query performance tuning — analyzes execution plans, identifies anti-patterns, recommends indexes, rewrites slow queries, and runs DMV diagnostics against live instances. |
 | [linkedin-articles](skills/linkedin-articles) | Write and optimize LinkedIn articles — 5 structure templates, 8 hook formulas, headline patterns, SEO keyword placement, and hashtag strategy. |
+| [excalidraw-diagram](skills/excalidraw-diagram) | Generate beautiful `.excalidraw` diagram files for architectures, workflows, and concepts — with visual argument design, evidence artifacts, and a Playwright-based render pipeline. |
 
 ## Installation
 
@@ -40,6 +41,7 @@ Skills trigger automatically based on your prompt. You can also invoke them dire
 | prompt-creator | `/skizha-skills:prompt-creator` |
 | sql-server-query-tuner | `/skizha-skills:sql-server-query-tuner` |
 | linkedin-articles | `/skizha-skills:linkedin-articles` |
+| excalidraw-diagram | `/skizha-skills:excalidraw-diagram` |
 
 **Humanize** — activates when you say things like:
 - "humanize this text"
@@ -73,6 +75,14 @@ Supports both pasting queries/execution plans for analysis and running DMV diagn
 - "improve my article structure"
 
 Includes 5 article structure templates (Problem-Solution, Listicle, Story-Driven, How-To, Contrarian), 8 hook formulas with examples, headline patterns, SEO keyword placement guidance, and a hashtag strategy (broad/mid/niche mix). Delivers ready-to-paste output with hashtags.
+
+**Excalidraw Diagram** — activates when you say things like:
+- "create a diagram for my authentication flow"
+- "draw an architecture diagram for this system"
+- "visualize this workflow as an Excalidraw diagram"
+- "make an Excalidraw diagram showing the data pipeline"
+
+Generates `.excalidraw` JSON files following visual argument design principles — fan-outs for one-to-many, timelines for sequences, convergence for aggregation. Includes a Playwright-based render pipeline to preview diagrams as PNG and iteratively fix layout issues. Customizable color palette and a library of element templates. Requires Python + `uv` for the optional render pipeline (one-time setup).
 
 ## Marketplace structure
 
