@@ -11,6 +11,7 @@ A plugin marketplace for [Claude Code](https://docs.anthropic.com/en/docs/claude
 | [sql-server-query-tuner](skills/sql-server-query-tuner) | SQL Server query performance tuning — analyzes execution plans, identifies anti-patterns, recommends indexes, rewrites slow queries, and runs DMV diagnostics against live instances. |
 | [linkedin-articles](skills/linkedin-articles) | Write and optimize LinkedIn articles — 5 structure templates, 8 hook formulas, headline patterns, SEO keyword placement, and hashtag strategy. |
 | [excalidraw-diagram](skills/excalidraw-diagram) | Generate beautiful `.excalidraw` diagram files for architectures, workflows, and concepts — with visual argument design, evidence artifacts, and a Playwright-based render pipeline. |
+| [product-design-harness](skills/product-design-harness) | Use when a product direction, feature, workflow, experiment, launch, feedback signal, automation, or scale decision needs judgment before execution or the next iteration. |
 
 ## Installation
 
@@ -42,6 +43,7 @@ Skills trigger automatically based on your prompt. You can also invoke them dire
 | sql-server-query-tuner | `/skizha-skills:sql-server-query-tuner` |
 | linkedin-articles | `/skizha-skills:linkedin-articles` |
 | excalidraw-diagram | `/skizha-skills:excalidraw-diagram` |
+| product-design-harness | `/skizha-skills:product-design-harness` |
 
 **Humanize** — activates when you say things like:
 - "humanize this text"
